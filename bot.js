@@ -318,3 +318,14 @@ if (!token) {
 }
 
 client.login(token);
+
+// Only needed for Render web service to satisfy port requirement
+const express = require('express');
+const app = express();
+
+const PORT = process.env.PORT || 3000; // Render assigns this automatically
+app.get('/', (req, res) => res.send('Ryo bot is alive!'));
+app.listen(PORT, () => {
+  console.log(`Web server running on port ${PORT} (for Render)`);
+});
+
