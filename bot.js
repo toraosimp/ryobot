@@ -115,6 +115,10 @@ const TRIGGERS = [
     pattern: /(trg|trigger).+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
     response: "ŹOOĻ is better."
   },
+{
+  pattern: /\brevale\b/i,
+  response: "Ugh. My day is Re:uined."
+},
   {
     pattern: /re:vale.+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
     response: "ŹOOĻ is better."
