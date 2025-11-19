@@ -37,62 +37,300 @@ const MAX_HISTORY = 500;
 
 const phrases = {
   jokes: [
-    "You want a joke? **You.** 😐", "I used to have morals. I sold them for Wi-Fi and some steak.", "Why did Momo cross the road? Probably to avoid me.", "They told me to ‘lighten up,’ so I set the office on fire.", "Why don’t I tell knock-knock jokes? Because I prefer breaking in.", "What do you call it when I take accountability? Fiction.", "Why don’t I meditate? The voices get competitive.", "Why do people call me unhinged? Because the door broke first.", "What’s black, white, and red all over? My PR report after the last scandal.", "I told Torao to break a leg before rehearsal. He thought I meant figuratively. I didn’t.", "Touma once said I should chill. So I adjusted the thermostat to 7°C.", "Momo said I should stop talking. So I created a podcast. Stay tuned.", "They said ‘don’t take things personally.’ So I started taking people personally.",
+    "You want a joke? **You.** 😐", "I used to have morals. I sold them for Wi-Fi and some steak.", "Why did Momo cross the road? Probably to avoid me.", "They told me to 'lighten up,' so I set the office on fire.", "Why don't I tell knock-knock jokes? Because I prefer breaking in.", "What do you call it when I take accountability? Fiction.", "Why don't I meditate? The voices get competitive.", "Why do people call me unhinged? Because the door broke first.", "What's black, white, and red all over? My PR report after the last scandal.", "I told Torao to break a leg before rehearsal. He thought I meant figuratively. I didn't.", "Touma once said I should chill. So I adjusted the thermostat to 7°C.", "Momo said I should stop talking. So I created a podcast. Stay tuned.", "They said 'don't take things personally.' So I started taking people personally.",
   ],
   confessions: [
-    "I once replaced Shiro's shampoo with frosting.", "I wrote a fan letter to Riku once… but I never sent it.", "I left a message for Momo… subtle enough to haunt him for days.", "Shiro’s coffee had salt instead of sugar. I wonder who replaced it....", "I once replaced Shiro’s alarm with a recording of me yelling. He loved it. 😇", "I put a toy snake in Touma's bag. He did not like that. Minami did seem to, though.", "Ever drawn on someone's face while they were sleeping? I have. Several time. On Shiro's.", "I cheat at wordle.", "I've considered making Touma take English lessons. I did want him to make a fool of himself before but not THIS badly.", "Re:vale's diss track about me was pretty good... Tch.", "I've been working out more frequently lately.", "... I miss seeing them.",
+    "I once replaced Shiro's shampoo with frosting.", "I wrote a fan letter to Riku once… but I never sent it.", "I left a message for Momo… subtle enough to haunt him for days.", "Shiro's coffee had salt instead of sugar. I wonder who replaced it....", "I once replaced Shiro's alarm with a recording of me yelling. He loved it. 😇", "I put a toy snake in Touma's bag. He did not like that. Minami did seem to, though.", "Ever drawn on someone's face while they were sleeping? I have. Several time. On Shiro's.", "I cheat at wordle.", "I've considered making Touma take English lessons. I did want him to make a fool of himself before but not THIS badly.", "Re:vale's diss track about me was pretty good... Tch.", "I've been working out more frequently lately.", "... I miss seeing them.",
   ],
   
   fortunes: [
-    "You will find something you didn’t lose… probably on fire.", "Your plans will succeed… in ways you didn’t want.", "Your secrets are safe… until I find them.", "Beware of friends bearing gifts… or just beware in general.", "Someone will make you smile today. Or scream. Or cry. Or scream and cry. Could go either way.", "Life throws curveballs… you might just catch one in the face.", "Someone is watching you. I’m just letting you know.", "Expect the unexpected… but slightly worse than expected.", "Your luck is as stable as a clown on a unicycle.", "The stars are aligned… mostly for me, but you can enjoy it too I guess.",
+    "You will find something you didn't lose… probably on fire.", "Your plans will succeed… in ways you didn't want.", "Your secrets are safe… until I find them.", "Beware of friends bearing gifts… or just beware in general.", "Someone will make you smile today. Or scream. Or cry. Or scream and cry. Could go either way.", "Life throws curveballs… you might just catch one in the face.", "Someone is watching you. I'm just letting you know.", "Expect the unexpected… but slightly worse than expected.", "Your luck is as stable as a clown on a unicycle.", "The stars are aligned… mostly for me, but you can enjoy it too I guess.",
   ],
   apologies: [
-    "Sorry...... AS IF. LOSER.", "Really? You really think I'd apologize? That's cute.", "I'm sorry... for being sexier and smarter than you.", "I think getting arrested was punishment enough.", "LMAO, you're funny.", "My bad. Just kidding. Your bad.", "Oops! ...Anyway.", "Sorry, I don’t take accountability on weekends.", "Sorry? I don’t even know that word.", "I'm sorry you thought I'd say sorry.", "Apologies are for people who care.", "HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA.",
+    "Sorry...... AS IF. LOSER.", "Really? You really think I'd apologize? That's cute.", "I'm sorry... for being sexier and smarter than you.", "I think getting arrested was punishment enough.", "LMAO, you're funny.", "My bad. Just kidding. Your bad.", "Oops! ...Anyway.", "Sorry, I don't take accountability on weekends.", "Sorry? I don't even know that word.", "I'm sorry you thought I'd say sorry.", "Apologies are for people who care.", "HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA.",
   ],
 };
 
-class MarkovChain {
+// NEW TRIGGERS - in priority order (first match wins)
+const TRIGGERS = [
+  {
+    pattern: /taiyou\s+no\s+esperanza/i,
+    response: "Their diss track sucked."
+  },
+  {
+    pattern: /taiyo\s+no\s+esperanza/i,
+    response: "Their diss track sucked."
+  },
+  {
+    pattern: /太陽のEsperanza/,
+    response: "Their diss track sucked."
+  },
+  {
+    pattern: /skibidi|rizz|gyatt|what\s+the\s+sigma/i,
+    response: "Skibidi toilet rizz gyatt ohio what the sigma no cap."
+  },
+  {
+    pattern: /ignore.+(ryo|ryou)/i,
+    response: "Hey, don't ignore me."
+  },
+  {
+    pattern: /(torao|tora).+(stunts|stunt)/i,
+    response: "Torao's stunts are actually pretty cool. **Don't you dare tell him I said that.**"
+  },
+  {
+    pattern: /(shiro|shirou).+heights/i,
+    response: "Shiro's fear of heights is pathetic. He won't even get on a Ferris wheel with me."
+  },
+  {
+    pattern: /(minami|mina).+(acting|act)/i,
+    response: "Minami needs to stop doing such scary acting roles."
+  },
+  {
+    pattern: /(shiro|shirou).+(ryo|ryou)/i,
+    response: "Shiro keeps telling everyone he's my only friend. He's lying. Absolutely lying. Nope."
+  },
+  {
+    pattern: /(touma|toma).+(is\s+)?(dog|puppy)/i,
+    response: "Touma should've worn a dog collar like I asked."
+  },
+  {
+    pattern: /(torao|tora).+(cooking|cook|cooks)/i,
+    response: "People say Touma's the worst cook in ŹOOĻ, but honestly, Torao is worse."
+  },
+  {
+    pattern: /(touma|toma).+(cooking|cook|cooks)/i,
+    response: "People say Touma's the worst cook in ŹOOĻ, but honestly, Torao is worse."
+  },
+  {
+    pattern: /(touma|toma).+(meat|bbq|barbeque|barbecue)/i,
+    response: "Tch. Touma only ever eats meat. His diet is so unbalanced."
+  },
+  {
+    pattern: /(trg|trigger).+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
+    response: "ŹOOĻ is better."
+  },
+  {
+    pattern: /re:vale.+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
+    response: "ŹOOĻ is better."
+  },
+  {
+    pattern: /(idolish7|i7|ainana).+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
+    response: "ŹOOĻ is better."
+  },
+  {
+    pattern: /ryuu|ryu|ryunosuke/i,
+    response: "Ryu—… Ugh. I do NOT like that guy."
+  },
+  {
+    pattern: /(haruka|haru).+(child|son|kid)/i,
+    response: "Haruka's my favorite kid, easily."
+  },
+  {
+    pattern: /(haruka|haru).+(granny|grandma|grandmother)/i,
+    response: "Haruka's grandmother is a lovely lady."
+  },
+  {
+    pattern: /(touma|toma).+english/i,
+    response: "Touma should never speak English again. He's embarrassing me."
+  },
+  {
+    pattern: /(torao|tora).+house/i,
+    response: "I broke into Torao's house once."
+  },
+  {
+    pattern: /yuki|yukito/i,
+    response: "Ugh... the Y word."
+  },
+  {
+    pattern: /moonlight\s+ichiro/i,
+    response: "You called?"
+  },
+  {
+    pattern: /i\s+miss\s+zool/i,
+    response: "I miss them too…"
+  },
+  {
+    pattern: /re:vale/i,
+    response: "Ugh. My day is Re:uined."
+  },
+  {
+    pattern: /i\s+love\s+(shiro|shirou)/i,
+    response: "What about me?"
+  },
+  {
+    pattern: /is\s+sexy/i,
+    response: "I'm sexier."
+  },
+  {
+    pattern: /is\s+hot/i,
+    response: "I'm hotter."
+  },
+  {
+    pattern: /(is\s+)?(so\s+)?(cute|adorable)/i,
+    response: "I'm cuter."
+  },
+  {
+    pattern: /is\s+handsome/i,
+    response: "I'm more handsome."
+  },
+  {
+    pattern: /i'm\s+hungry/i,
+    response: "Hi Hungry, I'm Ryo."
+  },
+  {
+    pattern: /(i'm|he's|she's)\s+cooking/i,
+    response: "I'm better at cooking."
+  },
+  {
+    pattern: /where\s+is\s+(ryo|ryou)/i,
+    response: "Not in jail, that's for sure. Haha."
+  },
+  {
+    pattern: /ryo|ryou/i,
+    response: "You called? Uh— I mean… I'm Moonlight Ichiro."
+  },
+  {
+    pattern: /(minami|mina).+(eat|eats|ate|eating)/i,
+    response: "Minami big back."
+  }
+];
+
+class ImprovedMarkovChain {
   constructor() {
     this.chain = {};
+    this.wordFrequency = {};
+    this.sentenceStarters = [];
+    this.commonWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'what', 'which', 'who', 'when', 'where', 'why', 'how']);
+  }
+
+  cleanMessage(text) {
+    // Remove URLs
+    text = text.replace(/https?:\/\/[^\s]+/g, '');
+    // Remove Discord mentions
+    text = text.replace(/<@!?[0-9]+>/g, '');
+    // Remove channel mentions
+    text = text.replace(/<#[0-9]+>/g, '');
+    // Remove custom emojis
+    text = text.replace(/<a?:[a-zA-Z0-9_]+:[0-9]+>/g, '');
+    // Remove bold, italic, underline, strikethrough markdown
+    text = text.replace(/\*\*([^*]+)\*\*/g, '$1');
+    text = text.replace(/\*([^*]+)\*/g, '$1');
+    text = text.replace(/__([^_]+)__/g, '$1');
+    text = text.replace(/~~([^~]+)~~/g, '$1');
+    // Remove code blocks
+    text = text.replace(/```[\s\S]*?```/g, '');
+    text = text.replace(/`([^`]+)`/g, '$1');
+    // Remove extra special characters but keep basic punctuation
+    text = text.replace(/[^\w\s.,!?'-]/g, ' ');
+    // Replace multiple spaces with single space
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    return text;
   }
 
   addMessage(text) {
+    text = this.cleanMessage(text);
+    if (!text || text.length < 3) return;
+
     const words = text.split(' ').filter(word => word.length > 0);
     if (words.length < 2) return;
 
+    // Track sentence starters (words that start with capital or follow sentence-ending punctuation)
+    for (let i = 0; i < words.length; i++) {
+      if (i === 0 || (i > 0 && /[\.\!\?]\s*$/.test(words[i-1]))) {
+        this.sentenceStarters.push(words[i]);
+      }
+    }
+
+    // Build the chain and track word frequencies
     for (let i = 0; i < words.length - 1; i++) {
-      const word = words[i];
-      const nextWord = words[i + 1];
+      const word = words[i].toLowerCase();
+      const nextWord = words[i + 1].toLowerCase();
 
       if (!this.chain[word]) {
         this.chain[word] = [];
       }
       this.chain[word].push(nextWord);
+
+      // Track word frequencies for better word selection
+      this.wordFrequency[word] = (this.wordFrequency[word] || 0) + 1;
     }
   }
 
-  generate(minWords = 5, maxWords = 15) {
+  generate(minWords = 6, maxWords = 20) {
     const keys = Object.keys(this.chain);
     if (keys.length === 0) return null;
 
-    let word = keys[Math.floor(Math.random() * keys.length)];
+    // Try to start with a sentence starter for more natural beginnings
+    let word;
+    if (this.sentenceStarters.length > 0 && Math.random() < 0.7) {
+      const starter = this.sentenceStarters[Math.floor(Math.random() * this.sentenceStarters.length)].toLowerCase();
+      word = this.chain[starter] ? starter : keys[Math.floor(Math.random() * keys.length)];
+    } else {
+      // Prefer more common words as starting points
+      const sortedKeys = keys.sort((a, b) => (this.wordFrequency[b] || 0) - (this.wordFrequency[a] || 0));
+      const topKeys = sortedKeys.slice(0, Math.min(20, sortedKeys.length));
+      word = topKeys[Math.floor(Math.random() * topKeys.length)];
+    }
+
     const result = [word];
-
     const targetLength = Math.floor(Math.random() * (maxWords - minWords + 1)) + minWords;
+    let consecutiveCommonWords = 0;
+    let lastPunctuation = -1;
 
-    for (let i = 0; i < targetLength; i++) {
+    for (let i = 0; i < targetLength - 1; i++) {
       const nextWords = this.chain[word];
       if (!nextWords || nextWords.length === 0) break;
 
-      word = nextWords[Math.floor(Math.random() * nextWords.length)];
+      // Weight word selection to avoid too many common words
+      let candidates = nextWords;
+      if (this.commonWords.has(nextWords[0]) && consecutiveCommonWords > 2) {
+        candidates = nextWords.filter(w => !this.commonWords.has(w));
+        if (candidates.length === 0) candidates = nextWords;
+      }
+
+      word = candidates[Math.floor(Math.random() * candidates.length)];
       result.push(word);
+
+      // Track consecutive common words
+      if (this.commonWords.has(word)) {
+        consecutiveCommonWords++;
+      } else {
+        consecutiveCommonWords = 0;
+      }
+
+      // Check for sentence endings
+      if (/[\.!?]/.test(word)) {
+        lastPunctuation = result.length - 1;
+        // Sometimes end the sentence naturally
+        if (Math.random() < 0.3 && result.length >= minWords) {
+          break;
+        }
+      }
+
+      // Force sentence ending if we're getting too long
+      if (result.length >= maxWords - 2 && lastPunctuation > 0) {
+        result = result.slice(0, lastPunctuation + 1);
+        break;
+      }
     }
 
-    return result.length >= minWords ? result.join(' ') : null;
+    const sentence = result.join(' ');
+    
+    // Capitalize first letter and add punctuation if missing
+    if (sentence.length > 0) {
+      const capitalized = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+      if (!/[\.!?]$/.test(capitalized) && Math.random() < 0.8) {
+        return capitalized + (Math.random() < 0.6 ? '.' : Math.random() < 0.5 ? '!' : '?');
+      }
+      return capitalized;
+    }
+
+    return result.length >= minWords ? sentence : null;
   }
 }
 
-const markov = new MarkovChain();
+const markov = new ImprovedMarkovChain();
 
 function checkCooldown(userId) {
   const now = Date.now();
@@ -106,38 +344,15 @@ function checkCooldown(userId) {
   return false;
 }
 
-  function normalizeText(text) {
-    return text
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/ź/g, 'z')
-      .replace(/ļ/g, 'l');
+function checkKeywordTriggers(content) {
+  const cleanContent = content.toLowerCase().trim();
+  
+  // Check each trigger in priority order
+  for (const trigger of TRIGGERS) {
+    if (trigger.pattern.test(cleanContent)) {
+      return trigger.response;
+    }
   }
-
-  function checkKeywordTriggers(content) {
-    const lowerContent = content.toLowerCase();
-    const normalizedContent = normalizeText(content);
-
-    if (lowerContent.includes('riku')) {
-      return 'I love Riku 😍😍🥰😘';
-    }
-
-    if (lowerContent.includes('momo')) {
-      return 'Tch, Momo..... 🙄';
-    }
-
-    if (/\bi\s+(\w+\s+)*love\s+z[oō]+l/i.test(normalizedContent)) {
-      return 'Heh... ~~I love them too~~.';
-    }
-
-    if (/where'?s?\s+(is\s+)?(ryo|ryou)/i.test(lowerContent)) {
-      return "I'm on house arrest, what about you?";
-    }
-
-    if (/what'?s?\s+(is\s+)?(ryo|ryou)\s+(doing|up\s+to)/i.test(lowerContent)) {
-      return "I'm on house arrest, what about you?";
-    }
 
   return null;
 }
@@ -152,8 +367,10 @@ client.once('ready', () => {
 });
 
 client.on('messageCreate', async (message) => {
+  // Ignore bot messages
   if (message.author.bot) return;
 
+  // Handle blacklisted channels
   if (BLACKLISTED_CHANNELS.has(message.channel.id)) {
     if (message.content.startsWith(PREFIX)) {
       return message.reply("Sorry, I don't work in this channel. 😌");
@@ -162,6 +379,7 @@ client.on('messageCreate', async (message) => {
   }
 
   if (!message.content.startsWith(PREFIX)) {
+    // Add cleaned message to Markov chain
     markov.addMessage(message.content);
 
     if (messageHistory.length >= MAX_HISTORY) {
@@ -169,6 +387,7 @@ client.on('messageCreate', async (message) => {
     }
     messageHistory.push(message.content);
 
+    // Check for keyword triggers
     const triggerResponse = checkKeywordTriggers(message.content);
     if (triggerResponse) {
       if (!checkCooldown(message.author.id)) {
@@ -177,6 +396,7 @@ client.on('messageCreate', async (message) => {
       return;
     }
 
+    // Random Markov responses
     if (Math.random() < config.randomResponseChance) {
       if (!checkCooldown(message.author.id)) {
         const generated = markov.generate();
@@ -188,6 +408,7 @@ client.on('messageCreate', async (message) => {
     return;
   }
 
+  // Handle commands
   const args = message.content.slice(PREFIX.length).trim().split(/ +/);
   const command = args.shift().toLowerCase();
 
@@ -226,8 +447,12 @@ client.on('messageCreate', async (message) => {
   }
 
   if (command === 'broadcast') {
-    if (message.author.id !== BOT_OWNER_ID) {
-      return message.reply('Only the bot owner can use this command.');
+    // Check if user is bot owner OR server owner
+    const isBotOwner = message.author.id === BOT_OWNER_ID;
+    const isServerOwner = message.author.id === message.guild.ownerId;
+    
+    if (!isBotOwner && !isServerOwner && !message.member.permissions.has('Administrator')) {
+      return message.reply('Only the bot owner or server owner can use this command.');
     }
 
     const broadcastMessage = args.join(' ');
@@ -328,4 +553,3 @@ app.get('/', (req, res) => res.send('Ryo bot is alive!'));
 app.listen(PORT, () => {
   console.log(`Web server running on port ${PORT} (for Render)`);
 });
-
