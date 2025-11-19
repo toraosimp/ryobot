@@ -70,11 +70,13 @@ const TRIGGERS = [
     response: "Skibidi toilet rizz gyatt ohio what the sigma no cap."
   },
   {
-    pattern: /ignore.+(ryo|ryou)/i,
+    // matches messages that contain both 'ignore' and 'ryo'/'ryou' anywhere
+    pattern: /\b(?=.*\bignore\b)(?=.*\b(?:ryo|ryou)\b).*/i,
     response: "Hey, don't ignore me."
   },
   {
-    pattern: /(torao|tora).+(stunts|stunt)/i,
+    // matches messages that contain both 'torao/tora' and 'stunt/stunts' anywhere
+    pattern: /\b(?=.*\b(?:torao|tora)\b)(?=.*\b(?:stunts?|stunt)\b).*/i,
     response: "Torao's stunts are actually pretty cool. **Don't you dare tell him I said that.**"
   },
   {
@@ -90,19 +92,23 @@ const TRIGGERS = [
     response: "Shiro keeps telling everyone he's my only friend. He's lying. Absolutely lying. Nope."
   },
   {
-    pattern: /(touma|toma).+(is\s+)?(dog|puppy)/i,
+    // touma/toma and dog/puppy anywhere
+    pattern: /\b(?=.*\b(?:touma|toma)\b)(?=.*\b(?:dog|puppy)\b).*/i,
     response: "Touma should've worn a dog collar like I asked."
   },
   {
-    pattern: /(torao|tora).+(cooking|cook|cooks)/i,
+    // torao/tora + cook conjugations anywhere
+    pattern: /\b(?=.*\b(?:torao|tora)\b)(?=.*\bcook(?:s|ed|ing)?\b).*/i,
     response: "People say Touma's the worst cook in ŹOOĻ, but honestly, Torao is worse."
   },
   {
-    pattern: /(touma|toma).+(cooking|cook|cooks)/i,
+    // touma/toma + cook conjugations anywhere
+    pattern: /\b(?=.*\b(?:touma|toma)\b)(?=.*\bcook(?:s|ed|ing)?\b).*/i,
     response: "People say Touma's the worst cook in ŹOOĻ, but honestly, Torao is worse."
   },
   {
-    pattern: /(touma|toma).+(meat|bbq|barbeque|barbecue)/i,
+    // touma/toma + meat keywords anywhere
+    pattern: /\b(?=.*\b(?:touma|toma)\b)(?=.*\b(?:meat|bbq|barbeque|barbecue)\b).*/i,
     response: "Tch. Touma only ever eats meat. His diet is so unbalanced."
   },
   {
@@ -121,12 +127,29 @@ const TRIGGERS = [
     pattern: /ryuu|ryu|ryunosuke/i,
     response: "Ryu—… Ugh. I do NOT like that guy."
   },
+{
+  pattern: /\briku\b/i,
+  response: "I love Riku 😍😍🥰😘"
+},
+{
+  pattern: /\bmomo\b/i,
+  response: "Tch, Momo..... 🙄"
+},
+{
+  pattern: /\bi\s+(\w+\s+)*love\s+z[oō]+l\b/i,
+  response: "Heh... ~~I love them too~~."
+},
   {
     pattern: /(haruka|haru).+(child|son|kid)/i,
     response: "Haruka's my favorite kid, easily."
   },
   {
     pattern: /(haruka|haru).+(granny|grandma|grandmother)/i,
+    response: "Haruka's grandmother is a lovely lady."
+  },
+  {
+    // New: Grandma Isumi trigger (matches when both grandma/granny/grandmother and isumi appear)
+    pattern: /\b(?=.*\b(?:grandma|granny|grandmother)\b)(?=.*\bisumi\b).*/i,
     response: "Haruka's grandmother is a lovely lady."
   },
   {
@@ -142,7 +165,8 @@ const TRIGGERS = [
     response: "Ugh... the Y word."
   },
   {
-    pattern: /moonlight\s+ichiro/i,
+    // Matches when both 'moonlight' and 'ichiro' appear anywhere (order-insensitive)
+    pattern: /\b(?=.*\bmoonlight\b)(?=.*\bichiro\b).*/i,
     response: "You called?"
   },
   {
@@ -174,15 +198,18 @@ const TRIGGERS = [
     response: "I'm more handsome."
   },
   {
-    pattern: /i'm\s+hungry/i,
+    // Matches I'm / im / i’m / i`m / i m hungry (apostrophe-optional and whitespace tolerant)
+    pattern: /\bi['’`]?m\s*hungry\b/i,
     response: "Hi Hungry, I'm Ryo."
   },
   {
-    pattern: /(i'm|he's|she's)\s+cooking/i,
+    // Matches variations of I'm/He's/She's cooking (apostrophe optional) and supports cook conjugations
+    pattern: /\b(?:i['’`]?m|he['’`]?s|she['’`]?s)\b\s*cook(?:s|ed|ing)?\b/i,
     response: "I'm better at cooking."
   },
   {
-    pattern: /where\s+is\s+(ryo|ryou)/i,
+    // Matches messages that mention ryo/ryou and also contain where/what/doing/up to
+    pattern: /\b(?=.*\b(?:ryo|ryou)\b)(?=.*\b(?:where|what|doing|up\s*to)\b).*/i,
     response: "Not in jail, that's for sure. Haha."
   },
   {
@@ -190,7 +217,8 @@ const TRIGGERS = [
     response: "You called? Uh— I mean… I'm Moonlight Ichiro."
   },
   {
-    pattern: /(minami|mina).+(eat|eats|ate|eating)/i,
+    // minami/mina + eat conjugations anywhere
+    pattern: /\b(?=.*\b(?:minami|mina)\b)(?=.*\b(?:eat|eats|ate|eating)\b).*/i,
     response: "Minami big back."
   }
 ];
