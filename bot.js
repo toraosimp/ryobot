@@ -160,6 +160,10 @@ const TRIGGERS = [
     pattern: /(touma|toma).+english/i,
     response: "Touma should never speak English again. He's embarrassing me."
   },
+   {
+    pattern: /(touma|toma).+engrish/i,
+    response: "Touma should never speak English again. He's embarrassing me."
+  },
   {
     pattern: /(torao|tora).+house/i,
     response: "I broke into Torao's house once."
@@ -218,7 +222,7 @@ const TRIGGERS = [
   },
   {
     pattern: /ryo|ryou/i,
-    response: "You called? Uh— I mean… I'm Moonlight Ichiro."
+    response: "I'm Moonlight Ichiro."
   },
   {
     // minami/mina + eat conjugations anywhere
