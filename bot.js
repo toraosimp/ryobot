@@ -1,3 +1,4 @@
+const triggerCooldowns = new Map(); // key = trigger response, value = last timestamp
 const { Client, GatewayIntentBits, ActivityType, EmbedBuilder } = require('discord.js');
 
 const client = new Client({
@@ -78,38 +79,51 @@ const TRIGGERS = [
     // matches messages that contain both 'torao/tora' and 'stunt/stunts' anywhere
     pattern: /\b(?=.*\b(?:torao|tora)\b)(?=.*\b(?:stunts?|stunt)\b).*/i,
     response: "Torao's stunts are actually pretty cool. **Don't you dare tell him I said that.**"
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
+
   },
   {
     pattern: /(shiro|shirou).+heights/i,
     response: "Shiro's fear of heights is pathetic. He won't even get on a Ferris wheel with me."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
+
   },
   {
     pattern: /(minami|mina).+(acting|act)/i,
     response: "Minami needs to stop doing such scary acting roles."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
+
   },
   {
     pattern: /(shiro|shirou).+(ryo|ryou)/i,
     response: "Shiro keeps telling everyone he's my only friend. He's lying. Absolutely lying. Nope."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
+
   },
   {
     // touma/toma and dog/puppy anywhere
     pattern: /\b(?=.*\b(?:touma|toma)\b)(?=.*\b(?:dog|puppy)\b).*/i,
     response: "Touma should've worn a dog collar like I asked."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
+
   },
   {
     // torao/tora + cook conjugations anywhere
     pattern: /\b(?=.*\b(?:torao|tora)\b)(?=.*\bcook(?:s|ed|ing)?\b).*/i,
     response: "People say Touma's the worst cook in ŹOOĻ, but honestly, Torao is worse."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
   },
   {
     // touma/toma + cook conjugations anywhere
     pattern: /\b(?=.*\b(?:touma|toma)\b)(?=.*\bcook(?:s|ed|ing)?\b).*/i,
     response: "People say Touma's the worst cook in ŹOOĻ, but honestly, Torao is worse."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
   },
   {
     // touma/toma + meat keywords anywhere
     pattern: /\b(?=.*\b(?:touma|toma)\b)(?=.*\b(?:meat|bbq|barbeque|barbecue)\b).*/i,
     response: "Tch. Touma only ever eats meat. His diet is so unbalanced."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
   },
   {
     pattern: /(trg|trigger).+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
@@ -159,10 +173,12 @@ const TRIGGERS = [
   {
     pattern: /(touma|toma).+english/i,
     response: "Touma should never speak English again. He's embarrassing me."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
   },
    {
     pattern: /(touma|toma).+engrish/i,
     response: "Touma should never speak English again. He's embarrassing me."
+    cooldown: 2 * 60 * 1000 // 2 minutes in ms
   },
   {
     pattern: /(torao|tora).+house/i,
@@ -179,7 +195,7 @@ const TRIGGERS = [
   },
   {
     pattern: /i\s+miss\s+zool/i,
-    response: "I miss them too…"
+    response: "~~I miss them too…~~"
   },
   {
     pattern: /re:vale/i,
@@ -382,10 +398,22 @@ function checkCooldown(userId) {
 
 function checkKeywordTriggers(content) {
   const cleanContent = content.toLowerCase().trim();
-  
-  // Check each trigger in priority order
+
   for (const trigger of TRIGGERS) {
     if (trigger.pattern.test(cleanContent)) {
+      // Check cooldown if it exists
+      if (trigger.cooldown) {
+        const lastUsed = triggerCooldowns.get(trigger.response) || 0;
+        const now = Date.now();
+
+        if (now - lastUsed < trigger.cooldown) {
+          return null; // still on cooldown
+        }
+
+        // Update last used time
+        triggerCooldowns.set(trigger.response, now);
+      }
+
       return trigger.response;
     }
   }
