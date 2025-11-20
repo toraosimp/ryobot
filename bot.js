@@ -128,10 +128,6 @@ const TRIGGERS = [
     pattern: /(trg|trigger).+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
     response: "ŹOOĻ is better."
   },
-{
-  pattern: /\brevale\b/i,
-  response: "Ugh. My day is Re:uined."
-},
   {
     pattern: /re:vale.+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
     response: "ŹOOĻ is better."
@@ -140,6 +136,10 @@ const TRIGGERS = [
     pattern: /(idolish7|i7|ainana).+(is\s+)?(the\s+best|is\s+cool|is\s+awesome)/i,
     response: "ŹOOĻ is better."
   },
+  {
+  pattern: /\brevale\b/i,
+  response: "Ugh. My day is Re:uined."
+},
   {
     pattern: /ryuu|ryu|ryunosuke/i,
     response: "Ryu—… Ugh. I do NOT like that guy."
@@ -236,7 +236,7 @@ const TRIGGERS = [
     response: "Not in jail, that's for sure. Haha."
   },
   {
-    pattern: /ryo|ryou/i,
+    pattern: /\b(?:ryo|ryou)\b/i,
     response: "I'm Moonlight Ichiro."
   },
   {
@@ -432,6 +432,7 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
   // Ignore bot messages
   if (message.author.bot) return;
+  
 
   // Handle blacklisted channels
   if (BLACKLISTED_CHANNELS.has(message.channel.id)) {
