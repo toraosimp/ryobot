@@ -642,11 +642,11 @@ client.on('messageCreate', async (message) => {
       .addFields(
         { 
           name: 'Fun (?) Commands', 
-          value: '`r!joke` - Get a really funny joke. 😇\n\n`r!confess` - Hear a serious confession from me...\n\n`r!fortune` - Get a very accurate fortune! Dont tell Minami though.\n\n`r!apologize` - Receive an extremely sincere apology.\n\n`r!8ball` - Ask a question and receive my divine wisdom.\n*Example*: r!8ball Is Kinako actually Zero?',
+          value: '`r!joke` - Get a really funny joke. 😇\n\n`r!confess` - Hear a serious confession from me...\n\n`r!fortune` - Get a very accurate fortune! Dont tell Minami though.\n\n`r!apologize` - Receive an extremely sincere apology.\n\n`r!8ball` - Ask a question and receive my divine wisdom.\nExample: r!8ball Is Kinako actually Zero?',
           inline: false 
         }
       )
-      .setFooter({ text: 'A Markov-style Ryo Tsukumo bot • Created by pinkmagic (Sky)' })
+      .setFooter({ text: 'A Markov-style bot • Created by pinkmagic (Sky)' })
       .setTimestamp();
 
     return message.channel.send({ embeds: [helpEmbed] });
