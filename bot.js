@@ -586,14 +586,9 @@ client.on('messageCreate', async (message) => {
           name: 'Fun (?) Commands', 
           value: '• `r!joke` - Get a really funny joke. 😇\n• `r!confess` - Hear a serious confession from me...\n• `r!fortune` - Get a very accurate fortune! Dont tell Minami though.\n• `r!apologize` - Receive an extremely sincere apology.',
           inline: false 
-        },
-        { 
-          name: 'Admin Commands', 
-          value: '• `r!setfrequency <0-100>` - Set bot response frequency (percentage)\n• `r!broadcast <message>` - Send a message as the bot\n• `r!editbroadcast <message_id> <text>` - Edit a bot message (or reply to message)',
-          inline: false 
         }
       )
-      .setFooter({ text: 'A Markov-style Ryo Tsukumo bot • Learning from your messages' })
+      .setFooter({ text: 'A Markov-style Ryo Tsukumo bot • Created by pinkmagic (Sky)' })
       .setTimestamp();
 
     return message.channel.send({ embeds: [helpEmbed] });
