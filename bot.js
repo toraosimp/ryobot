@@ -1,6 +1,5 @@
 const triggerCooldowns = new Map(); // key = trigger response, value = last timestamp
 const { Client, GatewayIntentBits, ActivityType, EmbedBuilder, ChannelType } = require('discord.js');
-const fetch = require('node-fetch');
 
 const client = new Client({
   intents: [
@@ -553,32 +552,19 @@ client.on('messageCreate', async (message) => {
 
     try {
       // Prepare message options
-      const msgOptions = {};
+      let broadcastContent = broadcastMessage || '';
       
-      if (broadcastMessage) {
-        msgOptions.content = broadcastMessage;
-      }
-      
-      // Include attachments if present - fetch them and send as files
+      // Include attachments if present - add URLs to message content
       if (message.attachments.size > 0) {
-        const files = [];
-        for (const [id, attachment] of message.attachments) {
-          try {
-            const response = await fetch(attachment.url);
-            const buffer = await response.arrayBuffer();
-            files.push({
-              attachment: Buffer.from(buffer),
-              name: attachment.name
-            });
-          } catch (err) {
-            console.error(`Failed to fetch attachment ${id}:`, err);
-          }
+        const attachmentUrls = Array.from(message.attachments.values()).map(att => att.url);
+        if (broadcastContent) {
+          broadcastContent += '\n\n';
         }
-        msgOptions.files = files;
+        broadcastContent += attachmentUrls.join('\n');
       }
 
       // Send the broadcast message
-      const sent = await message.channel.send(msgOptions);
+      const sent = await message.channel.send(broadcastContent);
       console.log(`Broadcast sent: ${sent.id}`);
       
       // Delete the original command message AFTER broadcast is sent
@@ -652,11 +638,11 @@ client.on('messageCreate', async (message) => {
     const helpEmbed = new EmbedBuilder()
       .setColor('#7d35b8')
       .setTitle('Ryo Bot Commands')
-      .setDescription('Here are all available commands:')
+      .setDescription('Command prefix: **r!**')
       .addFields(
         { 
           name: 'Fun (?) Commands', 
-          value: '`r!joke` - Get a really funny joke. 😇\n`r!confess` - Hear a serious confession from me...\n`r!fortune` - Get a very accurate fortune! Dont tell Minami though.\n`r!apologize` - Receive an extremely sincere apology.\n`r!8ball [question]` - Ask a question and receive my divine wisdom.',
+          value: '• `r!joke` - Get a really funny joke. 😇\n• `r!confess` - Hear a serious confession from me...\n• `r!fortune` - Get a very accurate fortune! Dont tell Minami though.\n• `r!apologize` - Receive an extremely sincere apology.\n• `r!8ball [question]` - Ask the 8ball a question and receive my divine wisdom.',
           inline: false 
         }
       )
@@ -684,3 +670,4 @@ app.get('/', (req, res) => res.send('Ryo bot is alive!'));
 app.listen(PORT, () => {
   console.log(`Web server running on port ${PORT} (for Render)`);
 });
+
