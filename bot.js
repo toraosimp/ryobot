@@ -1,5 +1,6 @@
 const triggerCooldowns = new Map(); // key = trigger response, value = last timestamp
-const { Client, GatewayIntentBits, ActivityType, EmbedBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, ActivityType, EmbedBuilder, ChannelType } = require('discord.js');
+const fetch = require('node-fetch');
 
 const client = new Client({
   intents: [
@@ -50,6 +51,28 @@ const phrases = {
   apologies: [
     "Sorry...... AS IF. LOSER.", "Really? You really think I'd apologize? That's cute.", "I'm sorry... for being sexier and smarter than you.", "I think getting arrested was punishment enough.", "LMAO, you're funny.", "My bad. Just kidding. Your bad.", "Oops! ...Anyway.", "Sorry, I don't take accountability on weekends.", "Sorry? I don't even know that word.", "I'm sorry you thought I'd say sorry.", "Apologies are for people who care.", "HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA.",
   ],
+  eightball: [
+    "It is certain. Probably.",
+    "It is decidedly so. Now stop bothering me.",
+    "Without a doubt. Unfortunately for you.",
+    "Yes, definitely. Try not to ruin it.",
+    "You may rely on it. Against my better judgment.",
+    "As I see it, yes. How amusing.",
+    "Most likely. Hehe.",
+    "Outlook good. Suspiciously good.",
+    "Yes. Ugh.",
+    "Signs point to yes. Not necessarily the good kind of signs.",
+    "Reply hazy. Come back later.",
+    "Ask again later. I'm busy plotting.",
+    "Better not tell you now. Watching you suffer builds character.",
+    "Cannot predict now. Stop bothering me.",
+    "Concentrate and ask again. Lmao.",
+    "All I'm gonna say is... don't count on it.",
+    "My reply is no. Cry about it.",
+    "My sources say no. They're very judgmental.",
+    "Outlook not so good. Yikes.",
+    "Very doubtful. Catastrophically doubtful."
+  ]
 };
 
 // NEW TRIGGERS - in priority order (first match wins)
@@ -231,8 +254,8 @@ const TRIGGERS = [
     response: "I'm better at cooking."
   },
   {
-    // Matches messages that mention ryo/ryou and also contain where/what/doing/up to
-    pattern: /\b(?=.*\b(?:ryo|ryou)\b)(?=.*\b(?:where|what|doing|up\s*to)\b).*/i,
+    // Matches specifically "where" + "ryo/ryou", "what" + "ryo/ryou" + "up/doing", "what's" + "ryo/ryou" + "up/doing"
+    pattern: /(?:where(?:'s|\s+is|'re)?\s+(?:ryo|ryou)|(?:what(?:'s|\s+is|'re)?\s+(?:ryo|ryou)(?:\s+up\s*to|\s+doing)))/i,
     response: "Not in jail, that's for sure. Haha."
   },
   {
@@ -433,6 +456,8 @@ client.on('messageCreate', async (message) => {
   // Ignore bot messages
   if (message.author.bot) return;
   
+  // Ignore messages in threads (only respond in regular channels)
+  if (message.channel.type === ChannelType.PublicThread || message.channel.type === ChannelType.PrivateThread) return;
 
   // Handle blacklisted channels
   if (BLACKLISTED_CHANNELS.has(message.channel.id)) {
@@ -520,13 +545,60 @@ client.on('messageCreate', async (message) => {
     }
 
     const broadcastMessage = args.join(' ');
-    if (!broadcastMessage) {
+    
+    // Allow broadcast even without text if there are attachments/media
+    if (!broadcastMessage && message.attachments.size === 0) {
       return message.reply('Please provide a message to broadcast.');
     }
 
-    await message.delete().catch(() => {});
-    const sent = await message.channel.send(broadcastMessage);
-    console.log(`Broadcast sent: ${sent.id}`);
+    try {
+      // Prepare message options
+      const msgOptions = {};
+      
+      if (broadcastMessage) {
+        msgOptions.content = broadcastMessage;
+      }
+      
+      // Include attachments if present - fetch them and send as files
+      if (message.attachments.size > 0) {
+        const files = [];
+        for (const [id, attachment] of message.attachments) {
+          try {
+            const response = await fetch(attachment.url);
+            const buffer = await response.arrayBuffer();
+            files.push({
+              attachment: Buffer.from(buffer),
+              name: attachment.name
+            });
+          } catch (err) {
+            console.error(`Failed to fetch attachment ${id}:`, err);
+          }
+        }
+        msgOptions.files = files;
+      }
+
+      // Send the broadcast message
+      const sent = await message.channel.send(msgOptions);
+      console.log(`Broadcast sent: ${sent.id}`);
+      
+      // Delete the original command message AFTER broadcast is sent
+      await message.delete().catch((err) => {
+        console.error('Failed to delete broadcast command message:', err);
+      });
+    } catch (error) {
+      console.error('Error sending broadcast:', error);
+      return message.channel.send('Failed to send broadcast message.').catch(() => {});
+    }
+  }
+
+  if (command === '8ball') {
+    const question = args.join(' ');
+    if (!question) {
+      return message.reply('You need to ask a question! Usage: r!8ball [question]');
+    }
+
+    const response = phrases.eightball[Math.floor(Math.random() * phrases.eightball.length)];
+    return message.channel.send(response);
   }
 
   if (command === 'editbroadcast') {
@@ -580,11 +652,11 @@ client.on('messageCreate', async (message) => {
     const helpEmbed = new EmbedBuilder()
       .setColor('#7d35b8')
       .setTitle('Ryo Bot Commands')
-      .setDescription('Command prefix: **r!**')
+      .setDescription('Here are all available commands:')
       .addFields(
         { 
           name: 'Fun (?) Commands', 
-          value: '• `r!joke` - Get a really funny joke. 😇\n• `r!confess` - Hear a serious confession from me...\n• `r!fortune` - Get a very accurate fortune! Dont tell Minami though.\n• `r!apologize` - Receive an extremely sincere apology.',
+          value: '`r!joke` - Get a really funny joke. 😇\n`r!confess` - Hear a serious confession from me...\n`r!fortune` - Get a very accurate fortune! Dont tell Minami though.\n`r!apologize` - Receive an extremely sincere apology.\n`r!8ball [question]` - Ask a question and receive my divine wisdom.',
           inline: false 
         }
       )
